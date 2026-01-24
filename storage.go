@@ -20,8 +20,9 @@ type Rule struct {
 
 // Template 规则模板
 type Template struct {
-	Name  string `json:"name"`
-	Rules []Rule `json:"rules"`
+	Name      string `json:"name"`
+	Rules     []Rule `json:"rules"`
+	CreatedAt string `json:"createdAt"`
 }
 
 // AppData 应用程序数据

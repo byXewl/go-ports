@@ -30,6 +30,5 @@ if %errorlevel% neq 0 (
 )
 
 echo 构建成功！
-echo 可执行文件port-forwarder.exe
 
 pause

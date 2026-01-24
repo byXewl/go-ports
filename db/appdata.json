@@ -25,28 +25,20 @@
       "targetPort": "222"
     },
     {
-      "id": "a12bd14b-3af4-4224-8f6b-9ff986d7427f",
-      "seq": 4,
-      "listenAddr": "",
-      "listenPort": "",
-      "targetAddr": "",
-      "targetPort": ""
-    },
-    {
-      "id": "75a6f9b0-d3dc-4354-81b3-265c60e351a5",
-      "seq": 5,
-      "listenAddr": "",
-      "listenPort": "",
-      "targetAddr": "",
-      "targetPort": ""
-    },
-    {
       "id": "1e80d453-789d-4b9f-8956-db57987b16cf",
       "seq": 6,
       "listenAddr": "",
       "listenPort": "",
       "targetAddr": "",
       "targetPort": ""
+    },
+    {
+      "id": "286a3433-1df4-4c33-9007-fae1b1592882",
+      "seq": 8,
+      "listenAddr": "",
+      "listenPort": "8082",
+      "targetAddr": "0.0.0.0",
+      "targetPort": "8080"
     }
   ],
   "templates": [
@@ -61,10 +53,11 @@
           "targetAddr": "192.168.226.1",
           "targetPort": "1"
         }
-      ]
+      ],
+      "createdAt": ""
     },
     {
-      "name": "换行",
+      "name": "换行哈哈",
       "rules": [
         {
           "id": "57dbcaf9-345d-4a69-869c-5c740a6958c3",
@@ -82,7 +75,18 @@
           "targetAddr": "192.168.226.1",
           "targetPort": "444"
         }
-      ]
+      ],
+      "createdAt": ""
+    },
+    {
+      "name": "哈哈哈",
+      "rules": null,
+      "createdAt": ""
+    },
+    {
+      "name": "66666",
+      "rules": null,
+      "createdAt": "2026-01-24 23:45:37"
     }
   ]
 }

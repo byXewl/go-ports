@@ -12,17 +12,18 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/skip2/go-qrcode"
 )
 
 var (
-	debugMode   = flag.Bool("debug", false, "Enable debug mode")
-	forwarder   *Forwarder
-	storage     *Storage
-	rules       []Rule
-	templates   []Template
+	debugMode = flag.Bool("debug", false, "Enable debug mode")
+	forwarder *Forwarder
+	storage   *Storage
+	rules     []Rule
+	templates []Template
 )
 
 func init() {
@@ -137,7 +138,7 @@ func initGUI() {
 	for {
 		log.Printf("Starting HTTP server on port %d...", port)
 		log.Printf("Please open http://localhost:%d in your browser", port)
-		
+
 		// 在终端中显示端口信息
 		fmt.Printf("Starting HTTP server on port %d...\n", port)
 		fmt.Printf("Please open http://localhost:%d in your browser\n", port)
@@ -315,9 +316,9 @@ func getHTMLContent() string {
         }
 
         .template-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
+            margin-top: 0px;
+            padding-top: 0px;
+            border-bottom: 0px solid #e0e0e0;
         }
 
         .template-header {
@@ -332,6 +333,15 @@ func getHTMLContent() string {
             gap: 10px;
             flex-wrap: wrap;
             align-items: center;
+        }
+
+        @media (max-width: 800px) {
+            .template-actions {
+                flex-direction: column;
+            }
+            .template-actions .btn {
+                width: 100%;
+            }
         }
 
         .template-select {
@@ -469,40 +479,42 @@ func getHTMLContent() string {
             </div>
         </div>
 
+        <div class="template-section">
+            <div class="template-header">
+          
+                    <select class="template-select" id="templateSelect">
+                        <option value="">选择模板</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="applyTemplate()">切换到模板</button>
+                    <button class="btn btn-success" onclick="startTemplateForward()">一键开启此模板所有转发</button>
+                    <button class="btn btn-danger" onclick="stopTemplateForward()">一键关闭此模板所有转发</button>
+                    <button class="btn btn-danger" onclick="deleteTemplate()">删除此模板</button>
+                    <button class="btn btn-info" onclick="editTemplate()">编辑模板</button>
+           
+            </div>
+           
+        </div>
+   
+
         <div class="rules-header">
             <div style="display: flex; align-items: center;">
                 <div class="rule-seq"><strong>序号</strong></div>
                 <div class="rule-config">
-                    <div><strong>源IP</strong></div>
-                    <div><strong>源端口</strong></div>
+                    <div><strong>监听IP</strong></div>
+                    <div><strong>监听端口</strong></div>
                     <div><strong>目标IP</strong></div>
                     <div><strong>目标端口</strong></div>
                 </div>
             </div>
         </div>
 
+
         <div class="rules-list" id="rulesList">
             <!-- 规则列表将通过 JavaScript 动态生成 -->
         </div>
+      
 
-        <div class="template-section">
-            <div class="template-header">
-                <h3>规则模板</h3>
-                <div class="template-actions">
-                    <select class="template-select" id="templateSelect">
-                        <option value="">选择模板</option>
-                    </select>
-                    <button class="btn btn-primary" onclick="applyTemplate()">切到模板</button>
-                    <button class="btn btn-success" onclick="startTemplateForward()">一键开启此模板所有转发</button>
-                    <button class="btn btn-danger" onclick="stopTemplateForward()">一键关闭此模板所有转发</button>
-                    <button class="btn btn-danger" onclick="deleteTemplate()">删除此模板</button>
-                    <button class="btn btn-info" onclick="editTemplate()">编辑模板</button>
-                </div>
-            </div>
-            <div class="template-list" id="templateList">
-                <!-- 模板列表将通过 JavaScript 动态生成 -->
-            </div>
-        </div>
+        
 
         <div class="status-message" id="statusMessage" style="display: none;"></div>
 
@@ -554,9 +566,9 @@ func getHTMLContent() string {
         function loadRules() {
             fetch('/api/getRules')
                 .then(response => response.json())
-                .then(data => {
-                    // 按照原始顺序显示
-                    rules = data;
+        .then(data => {
+                    // 倒序显示规则列表
+                    rules = data.slice().reverse();
                     renderRules();
                 })
                 .catch(error => {
@@ -577,41 +589,65 @@ func getHTMLContent() string {
                 });
         }
 
-        // 渲染规则列表
-        function renderRules() {
-            const rulesList = document.getElementById('rulesList');
-            rulesList.innerHTML = '';
+       // 渲染规则列表（倒序）
+function renderRules(){
+    const list = document.getElementById('rulesList');
+    list.innerHTML = '';
 
-            if (rules.length === 0) {
-                rulesList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">暂无规则，请点击"新增规则"按钮添加</p>';
-                return;
-            }
+    if(rules.length === 0){
+        list.innerHTML = '<p style="text-align:center;color:#999;padding:20px">暂无规则，请点击“新增规则”按钮添加</p>';
+        return;
+    }
 
-            rules.forEach((rule, index) => {
-                const ruleItem = document.createElement('div');
-                ruleItem.className = 'rule-item';
-                ruleItem.dataset.id = rule.id;
+    /* 倒序遍历，同步插壳保证顺序 */
+    for(let i = rules.length - 1; i >= 0; i--){
+        const r = rules[i];
 
-                // 检查TCP和UDP状态
-                Promise.all([
-                    fetch('/api/isTCPRunning?listenAddr=' + rule.listenAddr + '&listenPort=' + rule.listenPort).then(r => r.json()),
-                    fetch('/api/isUDPRunning?listenAddr=' + rule.listenAddr + '&listenPort=' + rule.listenPort).then(r => r.json())
-                ]).then(function(results) {
-                    const tcpResult = results[0];
-                    const udpResult = results[1];
-                    const tcpRunning = tcpResult.running;
-                    const udpRunning = udpResult.running;
+        const item = document.createElement('div');
+        item.className = 'rule-item';
+        item.dataset.id = r.id;
 
-                    ruleItem.innerHTML = '<input type="checkbox" class="rule-checkbox" data-id="' + rule.id + '"><div style="display: flex; align-items: center;"><div class="rule-seq">' + rule.seq + '</div><div class="rule-config"><select class="listen-addr" data-id="' + rule.id + '">' + renderIPOptions(rule.listenAddr) + '</select><input type="number" class="listen-port" data-id="' + rule.id + '" value="' + rule.listenPort + '" min="1" max="65535"><select class="target-addr" data-id="' + rule.id + '">' + renderTargetIPOptions(rule.targetAddr) + '</select><input type="number" class="target-port" data-id="' + rule.id + '" value="' + rule.targetPort + '" min="1" max="65535"></div></div><div class="rule-actions"><button class="btn ' + (tcpRunning ? 'btn-danger' : 'btn-success') + '" onclick="toggleTCPForward(' + index + ')">' + (tcpRunning ? '停止TCP转发' : '开启TCP转发') + '</button><button class="btn ' + (udpRunning ? 'btn-danger' : 'btn-success') + '" onclick="toggleUDPForward(' + index + ')">' + (udpRunning ? '停止UDP转发' : '开启UDP转发') + '</button><button class="btn btn-danger" onclick="deleteRule(\'' + rule.id + '\')">删除</button><button class="btn btn-primary" onclick="copyRule(' + index + ')">复制</button><button class="btn btn-warning" onclick="showQRCode(\'' + rule.listenAddr + '\', \'' + rule.listenPort + '\')">二维码</button></div>';
+        /* 用字符串拼接代替 ${}，避开 Go 模板冲突 */
+        item.innerHTML =
+            '<input type="checkbox" class="rule-checkbox" data-id="'+ r.id +'">'+
+            '<div style="display:flex;align-items:center">'+
+              '<div class="rule-seq">'+ r.seq +'</div>'+
+              '<div class="rule-config">'+
+                '<select class="listen-addr" data-id="'+ r.id +'">'+ renderIPOptions(r.listenAddr) +'</select>'+
+                '<input type="number" class="listen-port" data-id="'+ r.id +'" value="'+ r.listenPort +'" min="1" max="65535">'+
+                '<select class="target-addr" data-id="'+ r.id +'">'+ renderTargetIPOptions(r.targetAddr) +'</select>'+
+                '<input type="number" class="target-port" data-id="'+ r.id +'" value="'+ r.targetPort +'" min="1" max="65535">'+
+              '</div>'+
+            '</div>'+
+            '<div class="rule-actions">'+
+              '<button class="btn btn-default" data-role="tcpBtn">检测中…</button>'+
+              '<button class="btn btn-default" data-role="udpBtn">检测中…</button>'+
+              '<button class="btn btn-danger"  onclick="deleteRule(\''+ r.id +'\')">删除</button>'+
+              '<button class="btn btn-primary" onclick="copyRule('+ i +')">复制</button>'+
+              '<button class="btn btn-warning" onclick="showQRCode(\''+ r.listenAddr +'\','+ r.listenPort +')">二维码</button>'+
+            '</div>';
 
-                    rulesList.appendChild(ruleItem);
+        list.appendChild(item);          // 顺序固定
+        addRuleEventListeners(item, r.id); // 你原来的绑定函数
 
-                    // 添加事件监听器
-                    addRuleEventListeners(ruleItem, rule.id);
-                });
-            });
-        }
+        /* 异步只改按钮 */
+        Promise.all([
+            fetch('/api/isTCPRunning?listenAddr='+ r.listenAddr +'&listenPort='+ r.listenPort).then(res=>res.json()),
+            fetch('/api/isUDPRunning?listenAddr='+ r.listenAddr +'&listenPort='+ r.listenPort).then(res=>res.json())
+        ]).then(function(res){
+            const tcpBtn = item.querySelector('[data-role=tcpBtn]');
+            const udpBtn = item.querySelector('[data-role=udpBtn]');
 
+            tcpBtn.className   = res[0].running ? 'btn btn-danger' : 'btn btn-success';
+            tcpBtn.textContent = res[0].running ? '停止TCP转发' : '开启TCP转发';
+            tcpBtn.onclick     = function(){ toggleTCPForward(i); };
+
+            udpBtn.className   = res[1].running ? 'btn btn-danger' : 'btn btn-success';
+            udpBtn.textContent = res[1].running ? '停止UDP转发' : '开启UDP转发';
+            udpBtn.onclick     = function(){ toggleUDPForward(i); };
+        });
+    }
+}
         // 渲染IP选项
         function renderIPOptions(selectedAddr) {
             let options = '<option value="">选择监听地址</option>';
@@ -813,6 +849,7 @@ func getHTMLContent() string {
                 templateItem.innerHTML = '<div class="template-info">' +
                     '<div class="template-name">' + template.name + '</div>' +
                     '<div class="template-rules-count">规则数量: ' + template.rules.length + '</div>' +
+                    '<div class="template-sign" style="font-size:12px; color:#666; margin-top:4px;">创建时间: ' + (template.CreatedAt || '') + '</div>' +
                     '</div>' +
                     '<div class="template-actions">' +
                     '<button class="btn btn-primary" onclick="applyTemplateByName(\'' + template.name + '\')">切到模板</button>' +
@@ -1098,11 +1135,6 @@ func getHTMLContent() string {
 
         // 新建模板
         function createNewTemplate() {
-            const selectedCheckboxes = document.querySelectorAll('.rule-checkbox:checked');
-            if (selectedCheckboxes.length === 0) {
-                showMessage('请先选择要保存为模板的规则', 'info');
-                return;
-            }
 
             // 创建新建模板的对话框
             const overlay = document.createElement('div');
@@ -1147,7 +1179,8 @@ func getHTMLContent() string {
             document.getElementById('confirmBtn').addEventListener('click', function() {
                 const templateName = document.getElementById('templateName').value.trim();
                 if (templateName !== '') {
-                    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
+                    // 直接创建模板，不强制要求必须选择规则
+                    const selectedIds = Array.from(document.querySelectorAll('.rule-checkbox:checked')).map(cb => cb.dataset.id);
                     fetch('/api/saveAsTemplate', {
                         method: 'POST',
                         headers: {
@@ -2129,20 +2162,41 @@ func apiGetRules(w http.ResponseWriter, r *http.Request) {
 	// 创建规则副本
 	rulesCopy := make([]Rule, len(rules))
 	copy(rulesCopy, rules)
-	
-	// 按照Seq字段升序排序副本
+
+	// 按 Seq 字段降序排序副本，确保最新的在前
 	sort.Slice(rulesCopy, func(i, j int) bool {
-		return rulesCopy[i].Seq < rulesCopy[j].Seq
+		return rulesCopy[i].Seq > rulesCopy[j].Seq
 	})
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(rulesCopy)
 }
 
 // apiGetTemplates 获取模板
 func apiGetTemplates(w http.ResponseWriter, r *http.Request) {
+	// 按创建时间降序排序，最新的模板在前
+	sorted := make([]Template, len(templates))
+	copy(sorted, templates)
+	sort.Slice(sorted, func(i, j int) bool {
+		ti := parseCreatedAt(sorted[i].CreatedAt)
+		tj := parseCreatedAt(sorted[j].CreatedAt)
+		return tj.After(ti)
+	})
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(templates)
+	json.NewEncoder(w).Encode(sorted)
+}
+
+// parseCreatedAt 尝试把 CreatedAt 字符串解析为时间，空字符串返回零时间
+func parseCreatedAt(s string) time.Time {
+	if s == "" {
+		return time.Time{}
+	}
+	t, err := time.Parse("2006-01-02 15:04:05", s)
+	if err != nil {
+		return time.Time{}
+	}
+	return t
 }
 
 // apiAddRule 添加规则
@@ -2357,8 +2411,9 @@ func apiSaveAsTemplate(w http.ResponseWriter, r *http.Request) {
 	// 如果不存在，添加新模板
 	if !exists {
 		newTemplate := Template{
-			Name:  req.Name,
-			Rules: templateRules,
+			Name:      req.Name,
+			Rules:     templateRules,
+			CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
 		}
 		templates = append(templates, newTemplate)
 	}
@@ -2807,7 +2862,7 @@ func apiGetLog(w http.ResponseWriter, r *http.Request) {
 
 	// 设置响应头
 	w.Header().Set("Content-Type", "text/plain")
-	
+
 	// 返回日志内容
 	w.Write(logData)
 }
