@@ -1,0 +1,36 @@
+{
+  "rules": [
+    {
+      "id": "0adac88a-6022-457c-8dfa-fd5c4934f4f0",
+      "seq": 1,
+      "listenAddr": "127.0.0.1",
+      "listenPort": "8082",
+      "targetAddr": "192.168.4.60",
+      "targetPort": "8080"
+    },
+    {
+      "id": "3ac0cae5-0894-48cb-9d52-a7d967d5948e",
+      "seq": 2,
+      "listenAddr": "",
+      "listenPort": "",
+      "targetAddr": "",
+      "targetPort": ""
+    }
+  ],
+  "templates": [
+    {
+      "name": "游戏1",
+      "rules": [
+        {
+          "id": "0adac88a-6022-457c-8dfa-fd5c4934f4f0",
+          "seq": 1,
+          "listenAddr": "",
+          "listenPort": "8082",
+          "targetAddr": "192.168.4.60",
+          "targetPort": "80"
+        }
+      ],
+      "createdAt": "2026-01-25 00:10:27"
+    }
+  ]
+}

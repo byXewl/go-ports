@@ -1,0 +1,22 @@
+2026/01/25 00:10:07 main.go:61: Starting port forwarder...
+2026/01/25 00:10:07 main.go:94: Loading configuration...
+2026/01/25 00:10:07 storage.go:103: Loaded 0 rules
+2026/01/25 00:10:07 storage.go:125: Loaded 0 templates
+2026/01/25 00:10:07 main.go:139: Starting HTTP server on port 8080...
+2026/01/25 00:10:07 main.go:140: Please open http://localhost:8080 in your browser
+2026/01/25 00:10:27 storage.go:81: Saved app data: 0 rules, 1 templates
+2026/01/25 00:10:33 storage.go:81: Saved app data: 1 rules, 1 templates
+2026/01/25 00:10:52 storage.go:81: Saved app data: 1 rules, 1 templates
+2026/01/25 00:10:55 storage.go:81: Saved app data: 1 rules, 1 templates
+2026/01/25 00:11:05 storage.go:81: Saved app data: 1 rules, 1 templates
+2026/01/25 00:11:10 storage.go:81: Saved app data: 1 rules, 1 templates
+2026/01/25 00:11:11 forwarder.go:50: Started TCP forward: :8082 -> 192.168.4.60:80
+2026/01/25 00:11:13 forwarder.go:184: Error connecting to target 192.168.4.60:80: dial tcp 192.168.4.60:80: connectex: No connection could be made because the target machine actively refused it.
+2026/01/25 00:11:24 storage.go:81: Saved app data: 1 rules, 1 templates
+2026/01/25 00:11:48 storage.go:81: Saved app data: 1 rules, 1 templates
+2026/01/25 00:11:49 forwarder.go:173: Error accepting connection: accept tcp [::]:8082: use of closed network connection
+2026/01/25 00:11:49 forwarder.go:75: Stopped TCP forward: :8082
+2026/01/25 00:11:50 forwarder.go:50: Started TCP forward: :8082 -> 192.168.4.60:8080
+2026/01/25 00:12:22 storage.go:81: Saved app data: 2 rules, 1 templates
+2026/01/25 00:14:18 storage.go:81: Saved app data: 2 rules, 1 templates
+2026/01/25 00:14:19 forwarder.go:50: Started TCP forward: 127.0.0.1:8082 -> 192.168.4.60:8080
