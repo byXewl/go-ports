@@ -1,0 +1,16 @@
+[
+  {
+    "name": "666",
+    "rules": [
+      {
+        "id": "43bb9630-f285-44a6-8cb2-0633bbf6222a",
+        "seq": 9,
+        "listenAddr": "192.168.226.1",
+        "listenPort": "8082",
+        "targetAddr": "127.0.0.1",
+        "targetPort": "111",
+        "remark": ""
+      }
+    ]
+  }
+]

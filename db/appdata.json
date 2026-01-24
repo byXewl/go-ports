@@ -1,0 +1,88 @@
+{
+  "rules": [
+    {
+      "id": "57dbcaf9-345d-4a69-869c-5c740a6958c3",
+      "seq": 1,
+      "listenAddr": "192.168.55.1",
+      "listenPort": "1",
+      "targetAddr": "192.168.226.1",
+      "targetPort": "1"
+    },
+    {
+      "id": "830a929a-182d-43f7-937a-5aa11cdd9c44",
+      "seq": 2,
+      "listenAddr": "172.31.112.1",
+      "listenPort": "333",
+      "targetAddr": "172.31.112.1",
+      "targetPort": "444"
+    },
+    {
+      "id": "a6405953-5ced-49e0-bb39-1b16f2c0af5e",
+      "seq": 3,
+      "listenAddr": "192.168.226.1",
+      "listenPort": "111",
+      "targetAddr": "172.31.112.1",
+      "targetPort": "222"
+    },
+    {
+      "id": "a12bd14b-3af4-4224-8f6b-9ff986d7427f",
+      "seq": 4,
+      "listenAddr": "",
+      "listenPort": "",
+      "targetAddr": "",
+      "targetPort": ""
+    },
+    {
+      "id": "75a6f9b0-d3dc-4354-81b3-265c60e351a5",
+      "seq": 5,
+      "listenAddr": "",
+      "listenPort": "",
+      "targetAddr": "",
+      "targetPort": ""
+    },
+    {
+      "id": "1e80d453-789d-4b9f-8956-db57987b16cf",
+      "seq": 6,
+      "listenAddr": "",
+      "listenPort": "",
+      "targetAddr": "",
+      "targetPort": ""
+    }
+  ],
+  "templates": [
+    {
+      "name": "666",
+      "rules": [
+        {
+          "id": "57dbcaf9-345d-4a69-869c-5c740a6958c3",
+          "seq": 1,
+          "listenAddr": "192.168.55.1",
+          "listenPort": "1",
+          "targetAddr": "192.168.226.1",
+          "targetPort": "1"
+        }
+      ]
+    },
+    {
+      "name": "换行",
+      "rules": [
+        {
+          "id": "57dbcaf9-345d-4a69-869c-5c740a6958c3",
+          "seq": 1,
+          "listenAddr": "192.168.55.1",
+          "listenPort": "1",
+          "targetAddr": "192.168.226.1",
+          "targetPort": "1"
+        },
+        {
+          "id": "830a929a-182d-43f7-937a-5aa11cdd9c44",
+          "seq": 2,
+          "listenAddr": "172.31.112.1",
+          "listenPort": "333",
+          "targetAddr": "192.168.226.1",
+          "targetPort": "444"
+        }
+      ]
+    }
+  ]
+}
