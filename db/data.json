@@ -1,0 +1,94 @@
+{
+  "rules": [
+    {
+      "id": "a3e2f440-3cc3-4efd-8b9e-48d3c070b40d",
+      "seq": 1,
+      "listenAddr": "192.168.4.60",
+      "listenPort": "8080",
+      "targetAddr": "baidu.com",
+      "targetPort": "80"
+    },
+    {
+      "id": "0839b8d5-b7ae-4ed0-a5f3-5fabf720deac",
+      "seq": 2,
+      "listenAddr": "",
+      "listenPort": "",
+      "targetAddr": "",
+      "targetPort": ""
+    },
+    {
+      "id": "14cd0b82-3093-4392-8d7c-991d56301533",
+      "seq": 6,
+      "listenAddr": "",
+      "listenPort": "",
+      "targetAddr": "",
+      "targetPort": ""
+    },
+    {
+      "id": "3048b0a7-5a6d-47fd-adda-dc2a62985032",
+      "seq": 8,
+      "listenAddr": "172.31.112.1",
+      "listenPort": "8080",
+      "targetAddr": "baidu.com",
+      "targetPort": "80"
+    },
+    {
+      "id": "3d06953f-68d7-4094-bf34-b02812fb44d4",
+      "seq": 9,
+      "listenAddr": "",
+      "listenPort": "",
+      "targetAddr": "",
+      "targetPort": ""
+    },
+    {
+      "id": "1bc347a5-18b8-4fc8-a489-c58d71c55b04",
+      "seq": 10,
+      "listenAddr": "192.168.226.1",
+      "listenPort": "8080",
+      "targetAddr": "192.168.55.1",
+      "targetPort": "80"
+    },
+    {
+      "id": "c93bcec3-3343-45f2-b51b-5a2f829453ba",
+      "seq": 11,
+      "listenAddr": "",
+      "listenPort": "",
+      "targetAddr": "",
+      "targetPort": ""
+    },
+    {
+      "id": "d9e79f73-bfb1-442b-8e72-233fe75d7c25",
+      "seq": 12,
+      "listenAddr": "192.168.4.60",
+      "listenPort": "8081",
+      "targetAddr": "100.64.15.149",
+      "targetPort": "9999"
+    }
+  ],
+  "templates": [
+    {
+      "name": "55",
+      "rules": [
+        "a3e2f440-3cc3-4efd-8b9e-48d3c070b40d"
+      ],
+      "createdAt": "2026-01-29 19:01:35"
+    },
+    {
+      "name": "baidu",
+      "rules": [
+        "3048b0a7-5a6d-47fd-adda-dc2a62985032",
+        "a3e2f440-3cc3-4efd-8b9e-48d3c070b40d",
+        "d9e79f73-bfb1-442b-8e72-233fe75d7c25"
+      ],
+      "createdAt": "2026-01-29 20:53:35"
+    },
+    {
+      "name": "999",
+      "rules": [
+        "c93bcec3-3343-45f2-b51b-5a2f829453ba",
+        "1bc347a5-18b8-4fc8-a489-c58d71c55b04"
+      ],
+      "createdAt": "2026-01-30 10:27:30"
+    }
+  ]
+}

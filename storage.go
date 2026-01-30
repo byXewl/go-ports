@@ -20,9 +20,9 @@ type Rule struct {
 
 // Template 规则模板
 type Template struct {
-	Name      string `json:"name"`
-	Rules     []Rule `json:"rules"`
-	CreatedAt string `json:"createdAt"`
+	Name      string   `json:"name"`
+	Rules     []string `json:"rules"` // 存储规则ID列表
+	CreatedAt string   `json:"createdAt"`
 }
 
 // AppData 应用程序数据
@@ -40,7 +40,7 @@ type Storage struct {
 func NewStorage() *Storage {
 	dbDir := filepath.Join(".", "db")
 	return &Storage{
-		dataFile: filepath.Join(dbDir, "appdata.json"),
+		dataFile: filepath.Join(dbDir, "data.json"),
 	}
 }
 

@@ -1,0 +1,60 @@
+2026/01/30 10:57:13 Log file cleared at 2026-01-30 10:57:13
+2026/01/30 11:03:19 Logger initialized, log file: db\log.txt
+2026/01/30 11:03:20 [WebView2] Environment created successfully
+2026/01/30 11:03:56 Logger initialized, log file: db\log.txt
+2026/01/30 11:03:57 [WebView2] Environment created successfully
+2026/01/30 11:05:03 Started TCP forward: 172.31.112.1:8080 -> baidu.com:80
+2026/01/30 11:05:03 Started UDP forward: 172.31.112.1:8080 -> baidu.com:80
+2026/01/30 11:05:03 Started TCP forward: 192.168.226.1:8080 -> 192.168.55.1:80
+2026/01/30 11:05:03 Started UDP forward: 192.168.226.1:8080 -> 192.168.55.1:80
+2026/01/30 11:05:03 Started TCP forward: 192.168.4.60:8080 -> baidu.com:80
+2026/01/30 11:05:03 Started UDP forward: 192.168.4.60:8080 -> baidu.com:80
+2026/01/30 11:05:03 Started TCP forward: 192.168.4.60:8081 -> 100.64.15.149:9999
+2026/01/30 11:05:03 Started UDP forward: 192.168.4.60:8081 -> 100.64.15.149:9999
+2026/01/30 11:05:32 Stopped TCP forward: 172.31.112.1:8080
+2026/01/30 11:05:32 Error accepting connection: accept tcp 172.31.112.1:8080: use of closed network connection
+2026/01/30 11:05:32 Stopped UDP forward: 172.31.112.1:8080
+2026/01/30 11:05:32 Error reading UDP data: read udp 172.31.112.1:8080: use of closed network connection
+2026/01/30 11:05:32 Error accepting connection: accept tcp 192.168.226.1:8080: use of closed network connection
+2026/01/30 11:05:32 Stopped TCP forward: 192.168.226.1:8080
+2026/01/30 11:05:32 Error reading UDP data: read udp 192.168.226.1:8080: use of closed network connection
+2026/01/30 11:05:32 Stopped UDP forward: 192.168.226.1:8080
+2026/01/30 11:05:32 Error accepting connection: accept tcp 192.168.4.60:8080: use of closed network connection
+2026/01/30 11:05:32 Stopped TCP forward: 192.168.4.60:8080
+2026/01/30 11:05:32 Error reading UDP data: read udp 192.168.4.60:8080: use of closed network connection
+2026/01/30 11:05:32 Stopped UDP forward: 192.168.4.60:8080
+2026/01/30 11:05:32 Error accepting connection: accept tcp 192.168.4.60:8081: use of closed network connection
+2026/01/30 11:05:32 Stopped TCP forward: 192.168.4.60:8081
+2026/01/30 11:05:32 Error reading UDP data: read udp 192.168.4.60:8081: use of closed network connection
+2026/01/30 11:05:32 Stopped UDP forward: 192.168.4.60:8081
+2026/01/30 11:17:20 Logger initialized, log file: db\log.txt
+2026/01/30 11:17:20 [WebView2] Environment created successfully
+2026/01/30 11:20:41 Logger initialized, log file: db\log.txt
+2026/01/30 11:20:41 [WebView2] Environment created successfully
+2026/01/30 11:21:15 Logger initialized, log file: db\log.txt
+2026/01/30 11:21:15 [WebView2] Environment created successfully
+2026/01/30 11:21:36 Logger initialized, log file: db\log.txt
+2026/01/30 11:21:36 [WebView2] Environment created successfully
+2026/01/30 11:24:06 Logger initialized, log file: db\log.txt
+2026/01/30 11:24:06 [WebView2] Environment created successfully
+2026/01/30 11:38:45 main.go:61: Starting port forwarder...
+2026/01/30 11:38:45 main.go:94: Loading configuration...
+2026/01/30 11:38:45 storage.go:103: Loaded 8 rules
+2026/01/30 11:38:45 storage.go:125: Loaded 3 templates
+2026/01/30 11:38:45 main.go:139: Starting HTTP server on port 8080...
+2026/01/30 11:38:45 main.go:140: Please open http://localhost:8080 in your browser
+2026/01/30 11:41:41 main.go:61: Starting port forwarder...
+2026/01/30 11:41:41 main.go:94: Loading configuration...
+2026/01/30 11:41:41 storage.go:103: Loaded 8 rules
+2026/01/30 11:41:41 storage.go:125: Loaded 3 templates
+2026/01/30 11:41:41 main.go:139: Starting HTTP server on port 8080...
+2026/01/30 11:41:41 main.go:140: Please open http://localhost:8080 in your browser
+2026/01/30 12:38:28 main.go:61: Starting port forwarder...
+2026/01/30 12:38:28 main.go:94: Loading configuration...
+2026/01/30 12:38:28 storage.go:103: Loaded 8 rules
+2026/01/30 12:38:28 storage.go:125: Loaded 3 templates
+2026/01/30 12:38:28 main.go:139: Starting HTTP server on port 8080...
+2026/01/30 12:38:28 main.go:140: Please open http://localhost:8080 in your browser
+2026/01/30 12:38:51 forwarder.go:50: Started TCP forward: 192.168.4.60:8081 -> 100.64.15.149:9999
+2026/01/30 12:38:52 forwarder.go:75: Stopped TCP forward: 192.168.4.60:8081
+2026/01/30 12:38:52 forwarder.go:173: Error accepting connection: accept tcp 192.168.4.60:8081: use of closed network connection

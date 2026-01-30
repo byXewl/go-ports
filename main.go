@@ -35,8 +35,8 @@ func init() {
 }
 
 func initLogger() {
-	// 设置日志文件
-	logFile, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	// 设置日志文件路径为db目录下的log.txt
+	logFile, err := os.OpenFile(filepath.Join(".", "db", "log.txt"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Printf("Failed to open log file: %v", err)
 		return
@@ -1487,19 +1487,24 @@ function renderRules(){
             }
 
             // 切换到模板记录
-            fetch('/api/getTemplates')
-                .then(response => response.json())
-                .then(data => {
-                    const template = data.find(t => t.name === templateName);
-                    if (template) {
-                        // 显示模板中的规则
-                        renderTemplateRules(template);
-                        showMessage('已切换到模板：' + templateName, 'success');
-                    }
-                })
-                .catch(error => {
-                    console.error('Failed to get template:', error);
-                });
+            fetch('/api/applyTemplate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: templateName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 显示模板中的规则
+                    renderTemplateRules({ name: templateName, rules: data.rules });
+                    showMessage('已切换到模板：' + templateName, 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Failed to get template:', error);
+            });
         }
 
         // 渲染模板规则
@@ -1512,7 +1517,12 @@ function renderRules(){
                 return;
             }
 
-            template.rules.forEach((rule, index) => {
+            // 按照规则的seq字段倒序排序
+            const sortedRules = template.rules.sort((a, b) => {
+                return (b.seq || 0) - (a.seq || 0);
+            });
+
+            sortedRules.forEach((rule, index) => {
                 const ruleItem = document.createElement('div');
                 ruleItem.className = 'rule-item';
                 ruleItem.dataset.id = rule.id;
@@ -1527,7 +1537,9 @@ function renderRules(){
                     const tcpRunning = tcpResult.running;
                     const udpRunning = udpResult.running;
 
-                    ruleItem.innerHTML = '<input type="checkbox" class="rule-checkbox" data-id="' + rule.id + '"><div style="display: flex; align-items: center;"><div class="rule-seq">' + rule.seq + '</div><div class="rule-config"><select class="listen-addr" data-id="' + rule.id + '">' + renderIPOptions(rule.listenAddr) + '</select><input type="number" class="listen-port" data-id="' + rule.id + '" value="' + rule.listenPort + '" min="1" max="65535"><select class="target-addr" data-id="' + rule.id + '">' + renderTargetIPOptions(rule.targetAddr) + '</select><input type="number" class="target-port" data-id="' + rule.id + '" value="' + rule.targetPort + '" min="1" max="65535"></div></div><div class="rule-actions"><button class="btn ' + (tcpRunning ? 'btn-danger' : 'btn-success') + '" onclick="toggleTCPForwardFromTemplate(' + index + ', \'' + template.name + '\')">' + (tcpRunning ? '停止TCP转发' : '开启TCP转发') + '</button><button class="btn ' + (udpRunning ? 'btn-danger' : 'btn-success') + '" onclick="toggleUDPForwardFromTemplate(' + index + ', \'' + template.name + '\')">' + (udpRunning ? '停止UDP转发' : '开启UDP转发') + '</button><button class="btn btn-danger" onclick="deleteRule(\'' + rule.id + '\')">删除</button><button class="btn btn-primary" onclick="copyRuleFromTemplate(' + index + ', \'' + template.name + '\')">复制</button><button class="btn btn-warning" onclick="showQRCode(\'' + rule.listenAddr + '\', \'' + rule.listenPort + '\')">二维码</button></div>';
+                    // 确保seq字段存在
+                    const seq = rule.seq || 0;
+                    ruleItem.innerHTML = '<input type="checkbox" class="rule-checkbox" data-id="' + rule.id + '"><div style="display: flex; align-items: center;"><div class="rule-seq">' + seq + '</div><div class="rule-config"><select class="listen-addr" data-id="' + rule.id + '">' + renderIPOptions(rule.listenAddr) + '</select><input type="number" class="listen-port" data-id="' + rule.id + '" value="' + rule.listenPort + '" min="1" max="65535"><select class="target-addr" data-id="' + rule.id + '">' + renderTargetIPOptions(rule.targetAddr) + '</select><input type="number" class="target-port" data-id="' + rule.id + '" value="' + rule.targetPort + '" min="1" max="65535"></div></div><div class="rule-actions"><button class="btn ' + (tcpRunning ? 'btn-danger' : 'btn-success') + '" onclick="toggleTCPForwardFromTemplate(' + index + ', \'' + template.name + '\')">' + (tcpRunning ? '停止TCP转发' : '开启TCP转发') + '</button><button class="btn ' + (udpRunning ? 'btn-danger' : 'btn-success') + '" onclick="toggleUDPForwardFromTemplate(' + index + ', \'' + template.name + '\')">' + (udpRunning ? '停止UDP转发' : '开启UDP转发') + '</button><button class="btn btn-danger" onclick="deleteRule(\'' + rule.id + '\')">删除</button><button class="btn btn-primary" onclick="copyRuleFromTemplate(' + index + ', \'' + template.name + '\')">复制</button><button class="btn btn-warning" onclick="showQRCode(\'' + rule.listenAddr + '\', \'' + rule.listenPort + '\')">二维码</button></div>';
 
 
                     rulesList.appendChild(ruleItem);
@@ -2282,19 +2294,19 @@ func apiDeleteRules(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed to save rules: %v", err)
 	}
 
-	// 更新所有模板，过滤掉被删除的规则
+	// 更新所有模板，过滤掉被删除的规则ID
 	for i, template := range templates {
-		var newTemplateRules []Rule
-		for _, rule := range template.Rules {
+		var newTemplateRules []string
+		for _, ruleID := range template.Rules {
 			keep := true
 			for _, id := range req.IDs {
-				if rule.ID == id {
+				if ruleID == id {
 					keep = false
 					break
 				}
 			}
 			if keep {
-				newTemplateRules = append(newTemplateRules, rule)
+				newTemplateRules = append(newTemplateRules, ruleID)
 			}
 		}
 		templates[i].Rules = newTemplateRules
@@ -2373,34 +2385,23 @@ func apiSaveAsTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 收集规则
-	var templateRules []Rule
-	for _, rule := range rules {
-		for _, id := range req.IDs {
-			if rule.ID == id {
-				templateRules = append(templateRules, rule)
-				break
-			}
-		}
-	}
-
 	// 检查是否已存在同名模板
 	exists := false
 	for i, template := range templates {
 		if template.Name == req.Name {
-			// 模板已存在，将新规则添加到模板中，避免重复
-			for _, newRule := range templateRules {
-				// 检查规则是否已存在于模板中
+			// 模板已存在，将新规则ID添加到模板中，避免重复
+			for _, newID := range req.IDs {
+				// 检查规则ID是否已存在于模板中
 				existsInTemplate := false
-				for _, existingRule := range template.Rules {
-					if existingRule.ID == newRule.ID {
+				for _, existingID := range template.Rules {
+					if existingID == newID {
 						existsInTemplate = true
 						break
 					}
 				}
-				// 如果规则不存在于模板中，添加它
+				// 如果规则ID不存在于模板中，添加它
 				if !existsInTemplate {
-					templates[i].Rules = append(templates[i].Rules, newRule)
+					templates[i].Rules = append(templates[i].Rules, newID)
 				}
 			}
 			exists = true
@@ -2412,7 +2413,7 @@ func apiSaveAsTemplate(w http.ResponseWriter, r *http.Request) {
 	if !exists {
 		newTemplate := Template{
 			Name:      req.Name,
-			Rules:     templateRules,
+			Rules:     req.IDs,
 			CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
 		}
 		templates = append(templates, newTemplate)
@@ -2461,9 +2462,20 @@ func apiApplyTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 根据模板中的规则ID列表获取对应的规则详情
+	var templateRules []Rule
+	for _, ruleID := range template.Rules {
+		for _, rule := range rules {
+			if rule.ID == ruleID {
+				templateRules = append(templateRules, rule)
+				break
+			}
+		}
+	}
+
 	// 返回模板规则，不添加到主规则列表
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "rules": template.Rules})
+	json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "rules": templateRules})
 }
 
 // Result 操作结果
@@ -2669,12 +2681,17 @@ func apiStartTemplateForward(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 启动所有规则的转发
-	for _, rule := range template.Rules {
-		// 启动TCP转发
-		forwarder.StartTCPForward(rule.ListenAddr, rule.ListenPort, rule.TargetAddr, rule.TargetPort)
-		// 启动UDP转发
-		forwarder.StartUDPForward(rule.ListenAddr, rule.ListenPort, rule.TargetAddr, rule.TargetPort)
+	// 根据模板中的规则ID列表获取对应的规则详情并启动转发
+	for _, ruleID := range template.Rules {
+		for _, rule := range rules {
+			if rule.ID == ruleID {
+				// 启动TCP转发
+				forwarder.StartTCPForward(rule.ListenAddr, rule.ListenPort, rule.TargetAddr, rule.TargetPort)
+				// 启动UDP转发
+				forwarder.StartUDPForward(rule.ListenAddr, rule.ListenPort, rule.TargetAddr, rule.TargetPort)
+				break
+			}
+		}
 	}
 
 	// 返回成功
@@ -2715,12 +2732,17 @@ func apiStopTemplateForward(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 停止所有规则的转发
-	for _, rule := range template.Rules {
-		// 停止TCP转发
-		forwarder.StopTCPForward(rule.ListenAddr, rule.ListenPort)
-		// 停止UDP转发
-		forwarder.StopUDPForward(rule.ListenAddr, rule.ListenPort)
+	// 根据模板中的规则ID列表获取对应的规则详情并停止转发
+	for _, ruleID := range template.Rules {
+		for _, rule := range rules {
+			if rule.ID == ruleID {
+				// 停止TCP转发
+				forwarder.StopTCPForward(rule.ListenAddr, rule.ListenPort)
+				// 停止UDP转发
+				forwarder.StopUDPForward(rule.ListenAddr, rule.ListenPort)
+				break
+			}
+		}
 	}
 
 	// 返回成功
@@ -2853,7 +2875,7 @@ func apiUpdateTemplate(w http.ResponseWriter, r *http.Request) {
 // apiGetLog 获取日志
 func apiGetLog(w http.ResponseWriter, r *http.Request) {
 	// 读取日志文件
-	logData, err := os.ReadFile("log.txt")
+	logData, err := os.ReadFile(filepath.Join(".", "db", "log.txt"))
 	if err != nil {
 		log.Printf("Failed to read log file: %v", err)
 		http.Error(w, "Failed to read log file", http.StatusInternalServerError)
